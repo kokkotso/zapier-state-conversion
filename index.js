@@ -3,9 +3,7 @@
 // use "state" for Input Data key
 
 // initial State name or abbr
-const inputState = inputData.state;
-
-let outputState;
+const inputState = inputData.state ? inputData.state.trim().toLowerCase() : null;
 
 // US States lookup array
 const states = [
@@ -61,17 +59,25 @@ const states = [
   { stateName: "Wyoming", stateAbbr: "WY" }
 ];
 
-// conversion
-function convert(lookupKey, lookupValue) {
-  outputState = states.find((state) => state[lookupKey] === inputState)[lookupValue];
+// Utility: Convert "maryland" -> "Maryland"
+function toTitleCase(str) {
+  return str.replace(/\w\S*/g, function(txt) {
+    return txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase();
+  });
 }
 
-// check if input is state name or abbr
-if (inputState.length === 2) {
-  convert("stateAbbr", "stateName");
-} else {
-  convert("stateName", "stateAbbr");
-};
+// Convert logic
+let result = null;
+if (inputState) {
+  if (inputState.length === 2) {
+    // Convert abbreviation to state name
+    const found = states.find(s => s.stateAbbr.toLowerCase() === inputState);
+    result = found ? toTitleCase(found.stateName) : null;
+  } else {
+    // Convert name to abbreviation
+    const found = states.find(s => s.stateName.toLowerCase() === inputState);
+    result = found ? found.stateAbbr.toUpperCase() : null;
+  }
+}
 
-// output converted value
-output = {"convertedState": outputState};
+output = { convertedState: result || "Invalid state input" };
